@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-_dataColumns = [
+dataColumns = [
     'Date',
     'ApName',
     'NumOfUsers',
@@ -26,6 +26,22 @@ _dataColumns = [
     'PoorSnrClients'  # podłączone urządzenia ze słabym sygnałem
 ]
 
+finalDataColumns = [
+    'Day',
+    'Time',
+    'ApName',
+    'NumOfClients',  # liczba klientów podłączonych do AP
+    'TransmittedFrames',  # pomyślnie przesłane MSDU
+    'ChannelUtilization',  # oznacza przez jak długi czas kanał był zajęty
+    'PoorSnrClients',  # podłączone urządzenia ze słabym sygnałem
+    'Retries',  # pomyślne przesłanie MSDU po jednej lub kilku ponownych próbach
+    'MultipleRetries',  # pomyślne przesłane MSDU po więcej niż jednej ponownej próbach
+    'FrameDuplicates',  # wystąpienia duplikatów przesyłanych ramek
+    'Failed',  # niepowodzenia w przesłaniu MSDU
+    'FcsErrors',  # liczba błędów FCS w przesyłanych MSDU
+    'AckFailures',  # brak otrzymania ACK kiedy powinien zostać przesłany
+]
+
 
 def load_single_file(path):
     data = pd.read_csv(path, sep=';', header=None)
@@ -36,8 +52,11 @@ def load_single_file(path):
         inplace=True,
         axis=1
     )
-    data.columns = _dataColumns
-    return data
+    data.columns = dataColumns
+    date_time = data['Date'].str.split('--', expand=True)
+    data.drop(columns=['Date'])
+    data[['Date', 'Time']] = date_time
+    return data[finalDataColumns]
 
 
 def load_from_folder(folder_path):
