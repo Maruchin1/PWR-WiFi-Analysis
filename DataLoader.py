@@ -28,7 +28,8 @@ dataColumns = [
 
 finalDataColumns = [
     'Day',
-    'Time',
+    'Hour',
+    'Minute',
     'ApName',
     'NumOfClients',  # liczba klientów podłączonych do AP
     'TransmittedFrames',  # pomyślnie przesłane MSDU
@@ -53,9 +54,15 @@ def load_single_file(path):
         axis=1
     )
     data.columns = dataColumns
+
     date_time = data['Date'].str.split('--', expand=True)
     data.drop(columns=['Date'])
-    data[['Date', 'Time']] = date_time
+    data[['Day', 'Time']] = date_time
+
+    hour_minute = data['Time'].str.split('-', expand=True)
+    data.drop(columns=['Time'])
+    data[['Hour', 'Minute']] = hour_minute
+
     return data[finalDataColumns]
 
 
